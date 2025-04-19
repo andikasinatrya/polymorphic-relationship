@@ -30,10 +30,19 @@ class VideoController extends Controller
         return redirect()->route('videos.index')->with('success', 'Video created!');
     }
 
-    public function show(Video $video)
+    public function show($id)
     {
-        return view('video.show', compact('video'));
+        $video = Video::findOrFail($id);
+
+        $comments = $video->comments()
+        ->whereNull('parent_id')
+        ->with('replies')
+        ->latest()
+        ->get();
+
+        return view('video.show', compact('video', 'comments'));
     }
+
 
     public function edit(Video $video)
     {
